@@ -3,13 +3,13 @@ import os
 from sklearn.model_selection import train_test_split
 from shutil import copyfile
 
-images = sorted(os.listdir('/home/andreykozinov/SynthText/results/images'))
-labels = sorted(os.listdir('/home/andreykozinov/SynthText/results/labels'))
+images = sorted(os.listdir('/SynthText/results/images'))
+labels = sorted(os.listdir('/SynthText/results/labels'))
 
 train_img, val_img = train_test_split(images, test_size=0.2)
 
-source_path = '/home/andreykozinov/SynthText/results/'
-dest_path = '/home/andreykozinov/YoloOCR/dataset/'
+source_path = '/SynthText/results/'
+dest_path = '/YoloOCR/dataset/'
 # %%
 train_lbl = []
 val_lbl = []
