@@ -11,6 +11,6 @@ Development of a Low-cost Industrial OCR System with Deep Learning Technology
 As the result you will have a new folders with images and labels in the `\results` folder
 
 ### Train Yolov5 model with synthtext dataset
-1. Clone Yolov5 repository: `!git clone https://github.com/ultralytics/yolov5`
+1. Clone Yolov5 repository: `git clone https://github.com/ultralytics/yolov5`
 2. Install requirements: `pip install -qr requirements.txt`
 3. 
