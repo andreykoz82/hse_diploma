@@ -15,3 +15,4 @@ As the result you will have a new folders with images and labels in the `\result
 2. Install requirements: `pip install -qr requirements.txt`
 3. Make a train-test split of synthtext dataset using python script `\synthtext\split.py`. This will create new folder `dataset` with train and validation images and labels.
 4. Modify `\synthtext\data.yaml` file according to your needs (paths to train and val folders, number of classes, classes names). 
+5. Train Yolov5 model (specify path to `data.yaml`): `python train.py --img 640 --batch 16 --epochs 3 --data data.yaml --weights yolov5s.pt`
