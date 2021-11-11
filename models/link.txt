@@ -1,0 +1,1 @@
+Link to trained on SynthText Yolov5 model: https://drive.google.com/file/d/1SnoRvl5fSv7AWtyePWssyd0WrCaTh0rg/view?usp=sharing
