@@ -13,4 +13,5 @@ As the result you will have a new folders with images and labels in the `\result
 ### Train Yolov5 model with synthtext dataset
 1. Clone Yolov5 repository: `git clone https://github.com/ultralytics/yolov5`
 2. Install requirements: `pip install -qr requirements.txt`
-3. 
+3. Make a train-test split of synthtext dataset using python script `\synthtext\split.py`
+4. 
