@@ -55,7 +55,7 @@ if __name__ == '__main__':
             print('Making prediction')
 
             # create a new thread to do inference
-            thread1 = inferThread(yolov5_wrapper, frame)
+            thread1 = inferThread(yolov5_wrapper, frame[:, :, ::-1])
             thread1.start()
             thread1.join()
 
