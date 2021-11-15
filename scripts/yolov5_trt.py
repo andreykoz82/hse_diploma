@@ -20,7 +20,6 @@ def plot_one_box(x, img, color=(0, 128, 0), label=None, line_thickness=2):
     c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
     cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
     if label:
-        tf = max(tl - 1, 1)  # font thickness
         cv2.putText(
             img,
             label,
