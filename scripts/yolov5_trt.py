@@ -8,8 +8,8 @@ import pycuda.autoinit
 import tensorrt as trt
 import matplotlib.pyplot as plt
 
-CONF_THRESH = 0.65
-IOU_THRESHOLD = 0.4
+CONF_THRESH = 0.5
+IOU_THRESHOLD = 0.5
 
 
 def plot_one_box(x, img, color=(0, 128, 0), label=None, line_thickness=2):
@@ -26,11 +26,10 @@ def plot_one_box(x, img, color=(0, 128, 0), label=None, line_thickness=2):
             (c1[0], c1[1] - 2),
             0,
             tl / 3,
-            [220,20,60],
+            [220, 20, 60],
             thickness=2,
             lineType=cv2.LINE_AA,
         )
-
 
 
 class YoLov5TRT(object):
