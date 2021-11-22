@@ -66,6 +66,7 @@ def compare_bboxes_for_image(
     image,
     predicted_bboxes,
     predicted_class_labels,
+    use_time,
     draw_bboxes_fn=draw_pascal_voc_bboxes,
     draw_labels_fn=draw_labels,
     figsize=(4, 3)
@@ -79,6 +80,7 @@ def compare_bboxes_for_image(
         message = 'NOT OK'
         col = 'red'
     ax.text(100, 100, message, fontsize=36, color=col)
+    ax.set_title('time->{:.2f}ms'.format(use_time * 1000))
     ax.set_axis_off()
 
     draw_bboxes_fn(ax, predicted_bboxes)
@@ -396,7 +398,8 @@ class inferThread(threading.Thread):
 
     def run(self):
         result_boxes, result_scores, result_classid, use_time = self.yolov5_wrapper.infer(self.yolov5_wrapper.get_raw_image(self.image))
-        compare_bboxes_for_image(self.image, predicted_bboxes=result_boxes, predicted_class_labels=result_classid)
+        compare_bboxes_for_image(self.image, predicted_bboxes=result_boxes,
+                                 predicted_class_labels=result_classid, use_time=use_time)
         print('time->{:.2f}ms'.format(use_time * 1000))
 
 
