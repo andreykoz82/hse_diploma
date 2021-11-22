@@ -8,28 +8,77 @@ import pycuda.autoinit
 import tensorrt as trt
 import matplotlib.pyplot as plt
 
-CONF_THRESH = 0.5
-IOU_THRESHOLD = 0.5
+CONF_THRESH = 0.7
+IOU_THRESHOLD = 0.7
 
+import matplotlib.pyplot as plt
+from matplotlib import patches
 
-def plot_one_box(x, img, color=(0, 128, 0), label=None, line_thickness=2):
-    tl = (
-            line_thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1
-    )  # line/font thickness
-    color = color or [random.randint(0, 255) for _ in range(3)]
-    c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
-    cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
-    if label:
-        cv2.putText(
-            img,
-            label,
-            (c1[0], c1[1] - 2),
-            0,
-            tl / 3,
-            [220, 20, 60],
-            thickness=2,
-            lineType=cv2.LINE_AA,
+def get_rectangle_edges_from_pascal_bbox(bbox):
+    xmin_top_left, ymin_top_left, xmax_bottom_right, ymax_bottom_right = bbox
+
+    bottom_left = (xmin_top_left, ymax_bottom_right)
+    width = xmax_bottom_right - xmin_top_left
+    height = ymin_top_left - ymax_bottom_right
+
+    return bottom_left, width, height
+
+def draw_pascal_voc_bboxes(
+    plot_ax,
+    bboxes,
+    get_rectangle_corners_fn=get_rectangle_edges_from_pascal_bbox,
+):
+    for bbox in bboxes:
+        bottom_left, width, height = get_rectangle_corners_fn(bbox)
+
+        rect_1 = patches.Rectangle(
+            bottom_left,
+            width,
+            height,
+            linewidth=1,
+            edgecolor="green",
+            fill=False,
         )
+
+        # Add the patch to the Axes
+        plot_ax.add_patch(rect_1)
+
+def draw_labels(plot_ax, bboxes, class_labels):
+    for box, label in zip(bboxes, class_labels):
+      xmin_top_left, ymin_top_left, xmax_bottom_right, ymax_bottom_right = box
+      plot_ax.text(xmin_top_left + 6, ymin_top_left - 5, label, color='red',
+                   fontsize=10, weight='bold')
+
+def show_image(
+    image, bboxes=None, draw_bboxes_fn=draw_pascal_voc_bboxes,
+    draw_labels_fn=draw_labels, class_labels=None, figsize=(6, 5)
+):
+    fig, ax = plt.subplots(1, figsize=figsize)
+    ax.imshow(image)
+
+    if bboxes is not None:
+        draw_bboxes_fn(ax, bboxes)
+        draw_labels_fn(ax, bboxes, class_labels)
+    plt.show()
+
+
+def compare_bboxes_for_image(
+    image,
+    predicted_bboxes,
+    predicted_class_labels,
+    draw_bboxes_fn=draw_pascal_voc_bboxes,
+    draw_labels_fn=draw_labels,
+    figsize=(6, 5)
+):
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
+    ax.imshow(image)
+    ax.set_title("Prediction")
+
+    draw_bboxes_fn(ax, predicted_bboxes)
+    draw_labels_fn(ax, predicted_bboxes, predicted_class_labels)
+
+    plt.show()
+
 
 
 class YoLov5TRT(object):
@@ -133,16 +182,12 @@ class YoLov5TRT(object):
                 output[i * 6001: (i + 1) * 6001], batch_origin_h[i], batch_origin_w[i]
             )
             # Draw rectangles and labels on the original image
-            for j in range(len(result_boxes)):
-                box = result_boxes[j]
-                plot_one_box(
-                    box,
-                    batch_image_raw[i],
-                    label="{}".format(
-                        categories[int(result_classid[j])]
-                    ),
-                )
-        return batch_image_raw, end - start
+        result_classid = [int(x) for x in result_classid]
+        result_category = [categories[x] for x in result_classid]
+
+
+
+        return result_boxes, result_scores, result_category, end - start
 
     def destroy(self):
         # Remove any context from the top of the context stack, deactivating it.
@@ -343,9 +388,8 @@ class inferThread(threading.Thread):
         self.image = image
 
     def run(self):
-        batch_image_raw, use_time = self.yolov5_wrapper.infer(self.yolov5_wrapper.get_raw_image(self.image))
-        plt.imshow(batch_image_raw[0].squeeze())
-        plt.show()
+        result_boxes, result_scores, result_classid, use_time = self.yolov5_wrapper.infer(self.yolov5_wrapper.get_raw_image(self.image))
+        compare_bboxes_for_image(self.image, predicted_bboxes=result_boxes, predicted_class_labels=result_classid)
         print('time->{:.2f}ms'.format(use_time * 1000))
 
 
@@ -355,10 +399,10 @@ class warmUpThread(threading.Thread):
         self.yolov5_wrapper = yolov5_wrapper
 
     def run(self):
-        batch_image_raw, use_time = self.yolov5_wrapper.infer(self.yolov5_wrapper.get_raw_image_zeros())
-        print('warm_up->{}, time->{:.2f}ms'.format(batch_image_raw[0].shape, use_time * 1000))
+        result_boxes, result_scores, result_classid, use_time = self.yolov5_wrapper.infer(self.yolov5_wrapper.get_raw_image_zeros())
+        print('warm_up->{}, time->{:.2f}ms'.format(len(result_boxes), use_time * 1000))
 
 
 categories = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
-              'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-              'U', 'V', 'W', 'X', 'Y', 'Z']
+              'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T',
+              'U', 'V', 'W', 'X', 'Y', 'Z', 'goden']

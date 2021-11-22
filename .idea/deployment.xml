@@ -9,6 +9,7 @@
           </mappings>
           <excludedPaths>
             <excludedPath path="/Jetson_Yolo/tensorrtx/yolov5/build" />
+            <excludedPath path="/Jetson_Yolo/yolov5" />
           </excludedPaths>
         </serverdata>
       </paths>
