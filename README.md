@@ -18,9 +18,6 @@ As the result you will have a new folders with images and labels in the `\result
 5. Train Yolov5 model (specify path to `data.yaml`): `python train.py --img 640 --batch 16 --epochs 3 --data data.yaml --weights yolov5s.pt`
 6. Trained model can be downloaded from the link in the `\models\link.txt` file
 
-### Generate artificial dataset with real images
-
-
 ### Convert to TensorRT object
 1. Clone TensorRTX repository: `git clone https://github.com/wang-xinyu/tensorrtx.git`
 2. Generate .wts from pytorch model *.pt:\
@@ -34,6 +31,6 @@ As the result you will have a new folders with images and labels in the `\result
 `mkdir build`\
 `cd build`\
 `cp {ultralytics}/yolov5/yolov5s.wts {tensorrtx}/yolov5/build`\
-`cmake ..`
-`make`
+`cmake ..`\
+`make`\
 `sudo ./yolov5 -s [.wts] [.engine] [s]  // serialize model to plan file`\

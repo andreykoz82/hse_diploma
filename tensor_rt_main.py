@@ -51,7 +51,6 @@ if __name__ == '__main__':
             time.sleep(0.12)  # Sensor signal delay
             start_time = time.time()
             ret, frame = camera.read()  # stream from camera
-
             print('Making prediction')
 
             # create a new thread to do inference

@@ -79,7 +79,7 @@ def compare_bboxes_for_image(
         message = 'NOT OK'
         col = 'red'
     ax.text(100, 100, message, fontsize=36, color=col)
-    ax.set_title("Prediction")
+    ax.set_axis_off()
 
     draw_bboxes_fn(ax, predicted_bboxes)
     draw_labels_fn(ax, predicted_bboxes, predicted_class_labels)
