@@ -16,7 +16,7 @@ As the result you will have a new folders with images and labels in the `\result
 3. Make a train-test split of synthtext dataset using python script `\synthtext\split.py`. This will create new folder `dataset` with train and validation images and labels.
 4. Modify `\synthtext\data.yaml` file according to your needs (paths to train and val folders, number of classes, classes names). 
 5. Train Yolov5 model (specify path to `data.yaml`): `python train.py --img 640 --batch 16 --epochs 3 --data data.yaml --weights yolov5s.pt`
-6. Trained model can be downloaded from the link in the `\models\link.txt` file
+6. Trained model can be downloaded from the model folder `\models`
 
 ### Convert to TensorRT object
 1. Clone TensorRTX repository: `git clone https://github.com/wang-xinyu/tensorrtx.git`
