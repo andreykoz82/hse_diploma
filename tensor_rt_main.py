@@ -1,8 +1,6 @@
 import sys
 import ctypes
 from scripts.yolov5_trt import YoLov5TRT, warmUpThread, inferThread
-import time
-import cv2
 import RPi.GPIO as GPIO
 import pycuda.autoinit
 import cv2, queue, threading, time
