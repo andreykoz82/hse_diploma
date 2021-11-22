@@ -5,6 +5,7 @@ import time
 import cv2
 import RPi.GPIO as GPIO
 import pycuda.autoinit
+import cv2, queue, threading, time
 
 # load custom plugin and engine
 PLUGIN_LIBRARY = "/home/andrey/Jetson_Yolo/tensorrtx/yolov5/build/libmyplugins.so"
@@ -19,9 +20,34 @@ ctypes.CDLL(PLUGIN_LIBRARY)
 
 yolov5_wrapper = YoLov5TRT(engine_file_path)
 
-camera = cv2.VideoCapture(0)
-camera.set(3, 640)
-camera.set(4, 480)
+
+class VideoCapture:
+
+    def __init__(self, name):
+        self.cap = cv2.VideoCapture(name)
+        self.q = queue.Queue()
+        t = threading.Thread(target=self._reader)
+        t.daemon = True
+        t.start()
+
+    # read frames as soon as they are available, keeping only most recent one
+    def _reader(self):
+        while True:
+            ret, frame = self.cap.read()
+            if not ret:
+                break
+            if not self.q.empty():
+                try:
+                    self.q.get_nowait()  # discard previous (unprocessed) frame
+                except queue.Empty:
+                    pass
+            self.q.put(frame)
+
+    def read(self):
+        return self.q.get()
+
+
+camera = VideoCapture(0)
 
 GPIO.setmode(GPIO.BOARD)
 inputPin = 15
@@ -50,7 +76,7 @@ if __name__ == '__main__':
         if (x == 0) and (counter == 0):  # If sensor active
             time.sleep(0.12)  # Sensor signal delay
             start_time = time.time()
-            ret, frame = camera.read()  # stream from camera
+            frame = camera.read()  # stream from camera
             print('Making prediction')
 
             # create a new thread to do inference
