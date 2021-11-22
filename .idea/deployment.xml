@@ -7,6 +7,9 @@
           <mappings>
             <mapping deploy="/Jetson_Yolo" local="$PROJECT_DIR$" web="/" />
           </mappings>
+          <excludedPaths>
+            <excludedPath path="/Jetson_Yolo/tensorrtx/yolov5/build" />
+          </excludedPaths>
         </serverdata>
       </paths>
       <paths name="YandexVM">
