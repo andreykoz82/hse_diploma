@@ -47,11 +47,11 @@ def draw_labels(plot_ax, bboxes, class_labels):
     for box, label in zip(bboxes, class_labels):
       xmin_top_left, ymin_top_left, xmax_bottom_right, ymax_bottom_right = box
       plot_ax.text(xmin_top_left + 6, ymin_top_left - 5, label, color='red',
-                   fontsize=10, weight='bold')
+                   fontsize=7, weight='bold')
 
 def show_image(
     image, bboxes=None, draw_bboxes_fn=draw_pascal_voc_bboxes,
-    draw_labels_fn=draw_labels, class_labels=None, figsize=(6, 5)
+    draw_labels_fn=draw_labels, class_labels=None, figsize=(4, 3)
 ):
     fig, ax = plt.subplots(1, figsize=figsize)
     ax.imshow(image)
@@ -68,10 +68,17 @@ def compare_bboxes_for_image(
     predicted_class_labels,
     draw_bboxes_fn=draw_pascal_voc_bboxes,
     draw_labels_fn=draw_labels,
-    figsize=(6, 5)
+    figsize=(4, 3)
 ):
     fig, ax = plt.subplots(1, 1, figsize=figsize)
     ax.imshow(image)
+    if len(predicted_class_labels) == 40:
+        message = 'OK'
+        col = 'green'
+    else:
+        message = 'NOT OK'
+        col = 'red'
+    ax.text(100, 100, message, fontsize=36, color=col)
     ax.set_title("Prediction")
 
     draw_bboxes_fn(ax, predicted_bboxes)
