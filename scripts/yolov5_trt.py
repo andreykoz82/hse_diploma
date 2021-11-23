@@ -1,4 +1,3 @@
-import random
 import threading
 import time
 import cv2
@@ -7,12 +6,11 @@ import pycuda.driver as cuda
 import pycuda.autoinit
 import tensorrt as trt
 import matplotlib.pyplot as plt
+from matplotlib import patches
 
 CONF_THRESH = 0.7
 IOU_THRESHOLD = 0.7
 
-import matplotlib.pyplot as plt
-from matplotlib import patches
 
 def get_rectangle_edges_from_pascal_bbox(bbox):
     xmin_top_left, ymin_top_left, xmax_bottom_right, ymax_bottom_right = bbox
@@ -23,10 +21,11 @@ def get_rectangle_edges_from_pascal_bbox(bbox):
 
     return bottom_left, width, height
 
+
 def draw_pascal_voc_bboxes(
-    plot_ax,
-    bboxes,
-    get_rectangle_corners_fn=get_rectangle_edges_from_pascal_bbox,
+        plot_ax,
+        bboxes,
+        get_rectangle_corners_fn=get_rectangle_edges_from_pascal_bbox,
 ):
     for bbox in bboxes:
         bottom_left, width, height = get_rectangle_corners_fn(bbox)
@@ -43,15 +42,17 @@ def draw_pascal_voc_bboxes(
         # Add the patch to the Axes
         plot_ax.add_patch(rect_1)
 
+
 def draw_labels(plot_ax, bboxes, class_labels):
     for box, label in zip(bboxes, class_labels):
-      xmin_top_left, ymin_top_left, xmax_bottom_right, ymax_bottom_right = box
-      plot_ax.text(xmin_top_left + 6, ymin_top_left - 5, label, color='red',
-                   fontsize=7, weight='bold')
+        xmin_top_left, ymin_top_left, xmax_bottom_right, ymax_bottom_right = box
+        plot_ax.text(xmin_top_left + 6, ymin_top_left - 5, label, color='red',
+                     fontsize=7, weight='bold')
+
 
 def show_image(
-    image, bboxes=None, draw_bboxes_fn=draw_pascal_voc_bboxes,
-    draw_labels_fn=draw_labels, class_labels=None, figsize=(4, 3)
+        image, bboxes=None, draw_bboxes_fn=draw_pascal_voc_bboxes,
+        draw_labels_fn=draw_labels, class_labels=None, figsize=(4, 3)
 ):
     fig, ax = plt.subplots(1, figsize=figsize)
     ax.imshow(image)
@@ -63,13 +64,13 @@ def show_image(
 
 
 def compare_bboxes_for_image(
-    image,
-    predicted_bboxes,
-    predicted_class_labels,
-    use_time,
-    draw_bboxes_fn=draw_pascal_voc_bboxes,
-    draw_labels_fn=draw_labels,
-    figsize=(4, 3)
+        image,
+        predicted_bboxes,
+        predicted_class_labels,
+        use_time,
+        draw_bboxes_fn=draw_pascal_voc_bboxes,
+        draw_labels_fn=draw_labels,
+        figsize=(4, 3)
 ):
     fig, ax = plt.subplots(1, 1, figsize=figsize)
     ax.imshow(image)
@@ -87,7 +88,6 @@ def compare_bboxes_for_image(
     draw_labels_fn(ax, predicted_bboxes, predicted_class_labels)
 
     plt.show()
-
 
 
 class YoLov5TRT(object):
@@ -193,8 +193,6 @@ class YoLov5TRT(object):
             # Draw rectangles and labels on the original image
         result_classid = [int(x) for x in result_classid]
         result_category = [categories[x] for x in result_classid]
-
-
 
         return result_boxes, result_scores, result_category, end - start
 
@@ -397,7 +395,8 @@ class inferThread(threading.Thread):
         self.image = image
 
     def run(self):
-        result_boxes, result_scores, result_classid, use_time = self.yolov5_wrapper.infer(self.yolov5_wrapper.get_raw_image(self.image))
+        result_boxes, result_scores, result_classid, use_time = self.yolov5_wrapper.infer(
+            self.yolov5_wrapper.get_raw_image(self.image))
         compare_bboxes_for_image(self.image, predicted_bboxes=result_boxes,
                                  predicted_class_labels=result_classid, use_time=use_time)
         print('time->{:.2f}ms'.format(use_time * 1000))
@@ -409,8 +408,9 @@ class warmUpThread(threading.Thread):
         self.yolov5_wrapper = yolov5_wrapper
 
     def run(self):
-        result_boxes, result_scores, result_classid, use_time = self.yolov5_wrapper.infer(self.yolov5_wrapper.get_raw_image_zeros())
-        print('warm_up->{}, time->{:.2f}ms'.format(len(result_boxes), use_time * 1000))
+        result_boxes, result_scores, result_classid, use_time = self.yolov5_wrapper.infer(
+            self.yolov5_wrapper.get_raw_image_zeros())
+        print('warm_up')
 
 
 categories = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',

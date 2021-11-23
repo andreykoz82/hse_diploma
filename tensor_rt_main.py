@@ -6,8 +6,8 @@ import pycuda.autoinit
 import cv2, queue, threading, time
 
 # load custom plugin and engine
-PLUGIN_LIBRARY = "/home/andrey/Jetson_Yolo/tensorrtx/yolov5/build/libmyplugins.so"
-engine_file_path = "/home/andrey/Jetson_Yolo/tensorrtx/yolov5/build/yolov5s.engine"
+PLUGIN_LIBRARY = "/home/andrey/Jetson_Yolo/models/libmyplugins.so"
+engine_file_path = "/home/andrey/Jetson_Yolo/models/yolov5s.engine"
 
 if len(sys.argv) > 1:
     engine_file_path = sys.argv[1]
