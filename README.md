@@ -34,3 +34,7 @@ As the result you will have a new folders with images and labels in the `\result
 `cmake ..`\
 `make`\
 `sudo ./yolov5 -s [.wts] [.engine] [s]  // serialize model to plan file`\
+
+### Running on Jetson Nano
+
+![alt text]('img/results.png')
