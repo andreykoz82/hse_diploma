@@ -37,4 +37,4 @@ As the result you will have a new folders with images and labels in the `\result
 
 ### Running on Jetson Nano
 
-![Screenshot]('img/results.png')
+![alt text](img/results.png)
