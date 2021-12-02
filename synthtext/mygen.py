@@ -19,53 +19,34 @@ label_map = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8'
              'D': 13,
              'E': 14, 'F': 15, 'G': 16, 'H': 17, 'I': 18, 'J': 19, 'K': 20, 'L': 21, 'M': 22, 'N': 23, 'O': 24, 'P': 25,
              'Q': 26, 'R': 27,
-             'S': 28, 'T': 29, 'U': 30, 'V': 31, 'W': 32, 'X': 33, 'Y': 34, 'Z': 35}
+             'S': 28, 'T': 29, 'U': 30, 'V': 31, 'W': 32, 'X': 33, 'Y': 34, 'Z': 35,
+             'Г': 36, 'о': 37, 'д': 38, 'е': 39, 'н': 40, ':': 41, '/': 42}
 
 
-def sn_generator(size=13, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
-
-
-def gtin_generator(size=5, chars=string.digits):
-    return '046014980' + ''.join(random.choice(chars) for _ in range(size))
-
-
-def batch_generator():
-    date = ''.join(str(random.randint(1, 31)))
-    if len(date) == 1:
-        date = '0' + date
-
-    month = ''.join(str(random.randint(1, 12)))
-    if len(month) == 1:
-        month = '0' + month
-    year = ''.join(str(random.randint(20, 25)))
-    return date + month + year
-
-
+# %%
 def exp_generator():
     month = ''.join(str(random.randint(0, 12)))
     if len(month) == 1:
         month = '0' + month
     year = ''.join(str(random.randint(2020, 2025)))
-    return month + ' ' + year
+    return 'Годен до : ' + month + '/' + year
 
 
-def gen(N=5000):
-    for i in range(N):
-        gtin = gtin_generator()
+def sn_generator(size=13, repeat=100, chars=string.ascii_uppercase + string.digits):
+    return ' '.join(''.join(random.choice(chars) for _ in range(size)) for _ in range(repeat)) + ' ' + exp_generator()
+
+
+def gen(n=5000):
+    for i in range(n):
         sn = sn_generator()
-        batch = batch_generator()
-        exp = exp_generator()
-        yield gtin, sn, batch, exp
+        yield sn
 
 
 with open('data/newsgroup/newsgroup.txt', 'w') as f:
     for box in gen():
-        for label in box:
-            f.write(label + '\n')
-# %%
+        f.write(box + '\n')
 
-INSTANCE_PER_IMAGE = 20
+INSTANCE_PER_IMAGE = 3
 
 im_dir = 'bg_img'
 depth_db = h5py.File('depth.h5', 'r')
@@ -77,13 +58,13 @@ RV3 = RendererV3('data', max_time=5)
 
 
 def to_yolo(imgname, res, root_img, root_meta):
-
     for i, item in enumerate(res):
         Image.fromarray(item['img']).save(osp.join(root_img, f'{imgname}-{i}.png'))
         imh, imw = item['img'].shape[:2]
 
-        chars = list(filter(lambda x: x in string.ascii_uppercase + string.digits,
-                            chain(*item['txt'])))
+        chars = list(chain(*item['txt']))
+        result = map(str.rstrip, chars)
+        chars = list(filter(None, list(result)))
 
         assert len(chars) == item['charBB'].shape[-1]
 
